@@ -14,72 +14,128 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root{
-  --bg:#f2f2f7; --card:#ffffff; --text:#111114; --muted:#6e6e78; --line:#e3e3ea;
-  --accent:#0a84ff; --accent-soft:#e6f1ff; --ok:#30a46c; --err:#e5484d; --seg:#e3e3e8;
+  color-scheme: light dark;
+  --text:#101523; --muted:#6a7287; --line:rgba(20,40,90,.10);
+  --card:rgba(255,255,255,.74); --card-border:rgba(255,255,255,.85); --tile:rgba(240,244,255,.85);
+  --shadow:0 10px 34px rgba(40,70,140,.12);
+  --accent:#0a84ff; --accent2:#5e5ce6; --ok:#1fa971; --err:#e5484d;
+  --seg:rgba(120,130,160,.16); --seg-on:#ffffff; --input:rgba(255,255,255,.9);
+  --bg1:#cfe2ff; --bg2:#e3d8ff; --bg3:#f1f4fb;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#000000; --card:#1c1c1e; --text:#f5f5f7; --muted:#9a9aa3; --line:#2c2c2e;
-    --accent:#0a84ff; --accent-soft:#10233d; --ok:#3dd68c; --err:#ff6369; --seg:#2c2c2e;
+    --text:#f3f5fb; --muted:#99a1b8; --line:rgba(255,255,255,.09);
+    --card:rgba(28,31,46,.72); --card-border:rgba(255,255,255,.08); --tile:rgba(255,255,255,.06);
+    --shadow:0 10px 34px rgba(0,0,0,.45);
+    --accent:#4da3ff; --accent2:#8a86ff; --ok:#46d89a; --err:#ff6b70;
+    --seg:rgba(255,255,255,.09); --seg-on:rgba(255,255,255,.18); --input:rgba(255,255,255,.07);
+    --bg1:#12295a; --bg2:#2a1a5c; --bg3:#07080d;
   }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0}
 body{
-  background:var(--bg); color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:
+    radial-gradient(800px 520px at 0% -8%, var(--bg1) 0%, transparent 62%),
+    radial-gradient(700px 520px at 100% 0%, var(--bg2) 0%, transparent 58%),
+    var(--bg3);
+  background-attachment:fixed;
+  min-height:100vh;
+  padding:max(18px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
   line-height:1.4;
+  -webkit-font-smoothing:antialiased;
 }
 .app{max-width:480px;margin:0 auto}
-h1{font-size:28px;margin:8px 0 2px;letter-spacing:-.5px}
-.sub{color:var(--muted);font-size:14px;margin:0 0 16px}
-.seg{display:flex;background:var(--seg);border-radius:12px;padding:3px;gap:2px;margin-bottom:16px}
+.top{display:flex;align-items:center;gap:14px;margin:4px 0 16px}
+.logo{width:52px;height:52px;border-radius:14px;box-shadow:0 6px 18px rgba(60,80,220,.35);flex:0 0 auto}
+h1{font-size:28px;margin:0;letter-spacing:-.6px;line-height:1.1;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:14px;margin:3px 0 0}
+
+.seg{display:flex;background:var(--seg);border-radius:14px;padding:3px;gap:2px;margin-bottom:16px}
+#tabs{position:sticky;top:8px;z-index:5;backdrop-filter:blur(18px) saturate(170%);-webkit-backdrop-filter:blur(18px) saturate(170%);box-shadow:0 4px 18px rgba(30,50,110,.10)}
 .seg button{
-  flex:1;border:0;background:transparent;color:var(--text);font:inherit;font-size:14px;font-weight:600;
-  padding:9px 4px;border-radius:9px;cursor:pointer;transition:background .15s,box-shadow .15s
+  flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:600;
+  padding:10px 4px;border-radius:11px;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s,transform .1s
 }
-.seg button.on{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.18)}
-.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px}
-label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:500}
+.seg button:active{transform:scale(.97)}
+.seg button.on{background:var(--seg-on);color:var(--text);box-shadow:0 2px 8px rgba(20,30,70,.18)}
+
+.card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:22px;padding:18px;margin-bottom:14px;
+  box-shadow:var(--shadow);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%)
+}
+label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px 2px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 .row{display:flex;gap:10px;align-items:flex-end}
 .row > *{flex:1;min-width:0}
-.field{margin-bottom:12px}
+.field{margin-bottom:14px}
 .field:last-child{margin-bottom:0}
 input[type=date],input[type=number]{
-  width:100%;font:inherit;font-size:17px;color:var(--text);background:var(--bg);
-  border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;appearance:none;-webkit-appearance:none
+  width:100%;font:inherit;font-size:17px;font-weight:500;color:var(--text);background:var(--input);
+  border:1px solid var(--line);border-radius:14px;padding:11px 14px;min-height:48px;appearance:none;-webkit-appearance:none;
+  transition:border-color .15s,box-shadow .15s
 }
-input:focus{outline:2px solid var(--accent);outline-offset:0}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 22%,transparent)}
 .mini{
-  border:0;background:var(--accent-soft);color:var(--accent);font:inherit;font-size:13px;font-weight:600;
-  padding:11px 12px;border-radius:10px;cursor:pointer;flex:0 0 auto;min-height:44px
+  border:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font:inherit;font-size:14px;font-weight:700;
+  padding:0 18px;border-radius:14px;cursor:pointer;flex:0 0 auto;min-height:48px;box-shadow:0 6px 16px rgba(70,90,230,.35);transition:transform .1s
 }
-.hero{text-align:center;padding:22px 16px}
-.hero .big{font-size:30px;font-weight:700;letter-spacing:-.5px;color:var(--accent);word-spacing:2px}
-.hero .small{color:var(--muted);font-size:14px;margin-top:6px}
+.mini:active{transform:scale(.95)}
+
+.hero{
+  text-align:center;padding:26px 16px 22px;color:#fff;border:0;
+  background:linear-gradient(135deg,#2f93ff 0%,#5e5ce6 60%,#8a4fe0 100%);
+  box-shadow:0 14px 36px rgba(80,90,230,.38);position:relative;overflow:hidden
+}
+.hero::after{content:"";position:absolute;width:220px;height:220px;right:-70px;top:-90px;border-radius:50%;background:rgba(255,255,255,.14)}
+.hero::before{content:"";position:absolute;width:150px;height:150px;left:-50px;bottom:-70px;border-radius:50%;background:rgba(255,255,255,.10)}
+.hero > *{position:relative;z-index:1}
+.ymd{display:flex;justify-content:center;gap:10px}
+.ymd .u{flex:1;max-width:120px;background:rgba(255,255,255,.16);border-radius:16px;padding:12px 4px 10px}
+.ymd .u b{display:block;font-size:38px;line-height:1;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.ymd .u span{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;opacity:.85}
+.hero .big{font-size:32px;font-weight:800;letter-spacing:-.8px;line-height:1.15}
+.hero .small{color:rgba(255,255,255,.88);font-size:14px;margin-top:12px}
+.hero .ok{color:#c5ffe3;font-weight:700}
+.pill{display:inline-block;background:rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;margin-top:14px}
+
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:var(--bg);border-radius:12px;padding:12px}
-.stat b{display:block;font-size:19px;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
-.stat span{font-size:12px;color:var(--muted)}
+.stat{background:var(--tile);border-radius:16px;padding:13px 14px;border:1px solid var(--line)}
+.stat b{display:block;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.stat span{font-size:12px;color:var(--muted);font-weight:500}
+.stat:nth-child(6n+1) b{color:#0a84ff}
+.stat:nth-child(6n+2) b{color:#7d5cf0}
+.stat:nth-child(6n+3) b{color:#12a8a0}
+.stat:nth-child(6n+4) b{color:#f08a1c}
+.stat:nth-child(6n+5) b{color:#e5527a}
+.stat:nth-child(6n+6) b{color:#2fb56a}
 .list{margin:0;padding:0;list-style:none}
-.list li{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}
-.list li:last-child{border-bottom:0}
+.list li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+.list li:first-child{padding-top:2px}
+.list li:last-child{border-bottom:0;padding-bottom:2px}
 .list li span:first-child{color:var(--muted)}
 .list li span:last-child{text-align:right;font-weight:600}
-.err{color:var(--err);font-size:14px;text-align:center;padding:6px 0}
-.hint{color:var(--muted);font-size:12.5px;margin:10px 2px 0}
+.err{color:var(--err);font-size:14px;text-align:center;padding:10px 0;font-weight:600}
+.hint{color:var(--muted);font-size:12.5px;margin:12px 4px 0;text-align:center}
+.card .hint{text-align:left;margin:12px 0 0}
 .panel{display:none}
-.panel.on{display:block}
-.pill{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:13px;padding:4px 10px;border-radius:999px;margin-top:10px}
-.ok{color:var(--ok)}
-footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
+.panel.on{display:block;animation:rise .28s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.panel.on{animation:none}}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px;opacity:.8}
 </style>
 </head>
 <body>
 <div class="app">
-  <h1>Kor és Dátum</h1>
-  <p class="sub">Kor, dátumkülönbség és dátumszámolás egy helyen.</p>
+  <header class="top">
+    <img class="logo" src="favicon.svg" alt="">
+    <div>
+      <h1>Kor és Dátum</h1>
+      <p class="sub">Kor, dátumkülönbség és dátumszámolás egy helyen.</p>
+    </div>
+  </header>
 
   <div class="seg" id="tabs" role="tablist">
     <button class="on" data-tab="age">Kor</button>
@@ -212,7 +268,12 @@ function fmtDate(d){
   return d.getUTCFullYear()+'. '+HU_MONTHS[d.getUTCMonth()]+' '+d.getUTCDate()+'., '+HU_DAYS[d.getUTCDay()];
 }
 function nf(n){ return Math.round(n).toLocaleString('hu-HU'); }
-function ymdText(r){ return r.y+' év '+r.m+' hónap '+r.d+' nap'; }
+function ymdText(r){
+  return '<div class="ymd">'+
+    '<div class="u"><b>'+r.y+'</b><span>év</span></div>'+
+    '<div class="u"><b>'+r.m+'</b><span>hónap</span></div>'+
+    '<div class="u"><b>'+r.d+'</b><span>nap</span></div></div>';
+}
 function relDays(n){
   if(n === 0) return 'ma van';
   return n > 0 ? nf(n)+' nap múlva' : nf(-n)+' napja volt';
@@ -243,7 +304,7 @@ function renderAge(){
   const left = Math.round((nb - to)/DAY);
   const isToday = left === 0;
   out.innerHTML =
-    '<div class="card hero"><div class="big">'+ymdText(r)+'</div>'+
+    '<div class="card hero">'+ymdText(r)+''+
     '<div class="small">'+(r.y)+' éves'+(isToday?' · <span class="ok">ma van a születésnapod! 🎂</span>':'')+'</div></div>'+
     '<div class="card"><div class="grid">'+
       stat(nf(r.totalMonths), 'hónap')+
@@ -271,11 +332,11 @@ function renderDiff(){
   const r = diffYMD(a, b);
   const wd = weekdaysBetween(a, b);
   out.innerHTML =
-    '<div class="card hero"><div class="big">'+ymdText(r)+'</div>'+
+    '<div class="card hero">'+ymdText(r)+''+
     '<div class="small">'+nf(r.totalDays)+' nap telik el '+fmtDate(a).split(',')[0]+' és '+fmtDate(b).split(',')[0]+' között'+(swapped?' (a sorrendet felcseréltem)':'')+'</div></div>'+
     '<div class="card"><div class="grid">'+
       stat(nf(r.totalDays), 'nap')+
-      stat(nf(r.totalDays/7)+' ('+Math.floor(r.totalDays/7)+' hét '+(r.totalDays%7)+' nap)', 'hét')+
+      stat(nf(Math.floor(r.totalDays/7))+' hét '+(r.totalDays%7)+' nap', 'hetekben')+
       stat(nf(r.totalMonths), 'teljes hónap')+
       stat(nf(r.totalDays*24), 'óra')+
     '</div></div>'+
