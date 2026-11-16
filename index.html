@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NetguY Kor és Dátum Kalkulátor</title>
+<style>
+:root{
+  --bg:#f2f2f7; --card:#ffffff; --text:#111114; --muted:#6e6e78; --line:#e3e3ea;
+  --accent:#0a84ff; --accent-soft:#e6f1ff; --ok:#30a46c; --err:#e5484d; --seg:#e3e3e8;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#000000; --card:#1c1c1e; --text:#f5f5f7; --muted:#9a9aa3; --line:#2c2c2e;
+    --accent:#0a84ff; --accent-soft:#10233d; --ok:#3dd68c; --err:#ff6369; --seg:#2c2c2e;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+  line-height:1.4;
+}
+.app{max-width:480px;margin:0 auto}
+h1{font-size:28px;margin:8px 0 2px;letter-spacing:-.5px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+.seg{display:flex;background:var(--seg);border-radius:12px;padding:3px;gap:2px;margin-bottom:16px}
+.seg button{
+  flex:1;border:0;background:transparent;color:var(--text);font:inherit;font-size:14px;font-weight:600;
+  padding:9px 4px;border-radius:9px;cursor:pointer;transition:background .15s,box-shadow .15s
+}
+.seg button.on{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:500}
+.row{display:flex;gap:10px;align-items:flex-end}
+.row > *{flex:1;min-width:0}
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+input[type=date],input[type=number]{
+  width:100%;font:inherit;font-size:17px;color:var(--text);background:var(--bg);
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;appearance:none;-webkit-appearance:none
+}
+input:focus{outline:2px solid var(--accent);outline-offset:0}
+.mini{
+  border:0;background:var(--accent-soft);color:var(--accent);font:inherit;font-size:13px;font-weight:600;
+  padding:11px 12px;border-radius:10px;cursor:pointer;flex:0 0 auto;min-height:44px
+}
+.hero{text-align:center;padding:22px 16px}
+.hero .big{font-size:30px;font-weight:700;letter-spacing:-.5px;color:var(--accent);word-spacing:2px}
+.hero .small{color:var(--muted);font-size:14px;margin-top:6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--bg);border-radius:12px;padding:12px}
+.stat b{display:block;font-size:19px;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+.stat span{font-size:12px;color:var(--muted)}
+.list{margin:0;padding:0;list-style:none}
+.list li{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}
+.list li:last-child{border-bottom:0}
+.list li span:first-child{color:var(--muted)}
+.list li span:last-child{text-align:right;font-weight:600}
+.err{color:var(--err);font-size:14px;text-align:center;padding:6px 0}
+.hint{color:var(--muted);font-size:12.5px;margin:10px 2px 0}
+.panel{display:none}
+.panel.on{display:block}
+.pill{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:13px;padding:4px 10px;border-radius:999px;margin-top:10px}
+.ok{color:var(--ok)}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>Kor és Dátum</h1>
+  <p class="sub">Kor, dátumkülönbség és dátumszámolás egy helyen.</p>
+
+  <div class="seg" id="tabs" role="tablist">
+    <button class="on" data-tab="age">Kor</button>
+    <button data-tab="diff">Különbség</button>
+    <button data-tab="add">Dátum +/−</button>
+  </div>
+
+  <!-- KOR -->
+  <section class="panel on" id="p-age">
+    <div class="card">
+      <div class="field">
+        <label for="birth">Születési dátum</label>
+        <input type="date" id="birth" min="1900-01-01" max="2100-12-31">
+      </div>
+      <div class="field">
+        <label for="ageTo">Ennyi idős ekkor (alapból ma)</label>
+        <div class="row">
+          <input type="date" id="ageTo" min="1900-01-01" max="2100-12-31">
+          <button class="mini" id="ageToday" type="button">Ma</button>
+        </div>
+      </div>
+    </div>
+    <div id="ageOut"></div>
+  </section>
+
+  <!-- KÜLÖNBSÉG -->
+  <section class="panel" id="p-diff">
+    <div class="card">
+      <div class="field">
+        <label for="d1">Kezdődátum</label>
+        <div class="row">
+          <input type="date" id="d1" min="1900-01-01" max="2100-12-31">
+          <button class="mini" id="d1Today" type="button">Ma</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="d2">Végdátum</label>
+        <div class="row">
+          <input type="date" id="d2" min="1900-01-01" max="2100-12-31">
+          <button class="mini" id="d2Today" type="button">Ma</button>
+        </div>
+      </div>
+    </div>
+    <div id="diffOut"></div>
+  </section>
+
+  <!-- DÁTUM +/- -->
+  <section class="panel" id="p-add">
+    <div class="card">
+      <div class="field">
+        <label for="a0">Kiinduló dátum</label>
+        <div class="row">
+          <input type="date" id="a0" min="1900-01-01" max="2100-12-31">
+          <button class="mini" id="a0Today" type="button">Ma</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="seg" id="signSeg" style="margin-bottom:0">
+          <button class="on" data-sign="1" type="button">Hozzáadás</button>
+          <button data-sign="-1" type="button">Kivonás</button>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(4,1fr)">
+        <div><label for="aY">Év</label><input type="number" id="aY" min="0" max="500" value="0" inputmode="numeric"></div>
+        <div><label for="aM">Hónap</label><input type="number" id="aM" min="0" max="6000" value="0" inputmode="numeric"></div>
+        <div><label for="aW">Hét</label><input type="number" id="aW" min="0" max="30000" value="0" inputmode="numeric"></div>
+        <div><label for="aD">Nap</label><input type="number" id="aD" min="0" max="200000" value="0" inputmode="numeric"></div>
+      </div>
+    </div>
+    <div id="addOut"></div>
+  </section>
+
+  <footer>NetguY · Kor és Dátum Kalkulátor V1.0</footer>
+</div>
+
+<script>
+/* ===== LOGIKA (tiszta függvények) ===== */
+const DAY = 864e5;
+const HU_MONTHS = ['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
+const HU_DAYS = ['vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat'];
+
+function parseISO(s){
+  if(!s) return null;
+  const p = s.split('-').map(Number);
+  if(p.length !== 3 || !p[0] || !p[1] || !p[2]) return null;
+  return new Date(Date.UTC(p[0], p[1]-1, p[2]));
+}
+function todayUTC(){
+  const n = new Date();
+  return new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()));
+}
+function toISO(d){ return d.toISOString().slice(0,10); }
+function daysInMonth(y, m){ return new Date(Date.UTC(y, m+1, 0)).getUTCDate(); }
+function addMonths(d, n){
+  const first = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()+n, 1));
+  const y = first.getUTCFullYear(), m = first.getUTCMonth();
+  return new Date(Date.UTC(y, m, Math.min(d.getUTCDate(), daysInMonth(y, m))));
+}
+function addDays(d, n){ return new Date(d.getTime() + n*DAY); }
+function diffYMD(a, b){ // a <= b
+  let m = (b.getUTCFullYear()-a.getUTCFullYear())*12 + b.getUTCMonth() - a.getUTCMonth();
+  if(addMonths(a, m) > b) m--;
+  const days = Math.round((b - addMonths(a, m)) / DAY);
+  return { y: Math.floor(m/12), m: m % 12, d: days, totalMonths: m, totalDays: Math.round((b-a)/DAY) };
+}
+function weekdaysBetween(a, b){ // H–P, mindkét végnapot beleértve, a <= b
+  let n = 0;
+  for(let t = a.getTime(); t <= b.getTime(); t += DAY){
+    const w = new Date(t).getUTCDay();
+    if(w !== 0 && w !== 6) n++;
+  }
+  return n;
+}
+function zodiac(d){
+  const m = d.getUTCMonth()+1, day = d.getUTCDate(), v = m*100+day;
+  if(v>=321 && v<=419) return 'Kos';
+  if(v>=420 && v<=520) return 'Bika';
+  if(v>=521 && v<=620) return 'Ikrek';
+  if(v>=621 && v<=722) return 'Rák';
+  if(v>=723 && v<=822) return 'Oroszlán';
+  if(v>=823 && v<=922) return 'Szűz';
+  if(v>=923 && v<=1022) return 'Mérleg';
+  if(v>=1023 && v<=1121) return 'Skorpió';
+  if(v>=1122 && v<=1221) return 'Nyilas';
+  if(v>=1222 || v<=119) return 'Bak';
+  if(v>=120 && v<=218) return 'Vízöntő';
+  return 'Halak';
+}
+function fmtDate(d){
+  return d.getUTCFullYear()+'. '+HU_MONTHS[d.getUTCMonth()]+' '+d.getUTCDate()+'., '+HU_DAYS[d.getUTCDay()];
+}
+function nf(n){ return Math.round(n).toLocaleString('hu-HU'); }
+function ymdText(r){ return r.y+' év '+r.m+' hónap '+r.d+' nap'; }
+function relDays(n){
+  if(n === 0) return 'ma van';
+  return n > 0 ? nf(n)+' nap múlva' : nf(-n)+' napja volt';
+}
+/* ===== /LOGIKA ===== */
+
+const $ = id => document.getElementById(id);
+const stat = (v, l) => '<div class="stat"><b>'+v+'</b><span>'+l+'</span></div>';
+
+/* Fülek */
+document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-'+b.dataset.tab));
+  try { sessionStorage.setItem('kdTab', b.dataset.tab); } catch(e){}
+}));
+
+/* KOR */
+function renderAge(){
+  const birth = parseISO($('birth').value), to = parseISO($('ageTo').value) || todayUTC();
+  const out = $('ageOut');
+  if(!birth){ out.innerHTML = '<p class="hint">Add meg a születési dátumot.</p>'; return; }
+  if(birth > to){ out.innerHTML = '<p class="err">A születési dátum a célnap után van.</p>'; return; }
+  const r = diffYMD(birth, to);
+  const hours = r.totalDays*24, mins = hours*60;
+  let k = to.getUTCFullYear() - birth.getUTCFullYear();
+  let nb = addMonths(birth, 12*k);
+  if(nb < to){ k++; nb = addMonths(birth, 12*k); }
+  const left = Math.round((nb - to)/DAY);
+  const isToday = left === 0;
+  out.innerHTML =
+    '<div class="card hero"><div class="big">'+ymdText(r)+'</div>'+
+    '<div class="small">'+(r.y)+' éves'+(isToday?' · <span class="ok">ma van a születésnapod! 🎂</span>':'')+'</div></div>'+
+    '<div class="card"><div class="grid">'+
+      stat(nf(r.totalMonths), 'hónap')+
+      stat(nf(r.totalDays/7), 'hét (kerekítve)')+
+      stat(nf(r.totalDays), 'nap')+
+      stat(nf(hours), 'óra')+
+      stat(nf(mins), 'perc')+
+      stat(nf(mins*60), 'másodperc')+
+    '</div></div>'+
+    '<div class="card"><ul class="list">'+
+      '<li><span>Született</span><span>'+fmtDate(birth)+'</span></li>'+
+      '<li><span>Következő születésnap</span><span>'+(isToday?'Ma!':fmtDate(nb))+'</span></li>'+
+      '<li><span>Hátra</span><span>'+(isToday?'0 nap':nf(left)+' nap')+' ('+k+'. születésnap)</span></li>'+
+      '<li><span>Csillagjegy</span><span>'+zodiac(birth)+'</span></li>'+
+    '</ul></div>';
+}
+
+/* KÜLÖNBSÉG */
+function renderDiff(){
+  let a = parseISO($('d1').value), b = parseISO($('d2').value);
+  const out = $('diffOut');
+  if(!a || !b){ out.innerHTML = '<p class="hint">Add meg mindkét dátumot.</p>'; return; }
+  const swapped = a > b;
+  if(swapped){ const t = a; a = b; b = t; }
+  const r = diffYMD(a, b);
+  const wd = weekdaysBetween(a, b);
+  out.innerHTML =
+    '<div class="card hero"><div class="big">'+ymdText(r)+'</div>'+
+    '<div class="small">'+nf(r.totalDays)+' nap telik el '+fmtDate(a).split(',')[0]+' és '+fmtDate(b).split(',')[0]+' között'+(swapped?' (a sorrendet felcseréltem)':'')+'</div></div>'+
+    '<div class="card"><div class="grid">'+
+      stat(nf(r.totalDays), 'nap')+
+      stat(nf(r.totalDays/7)+' ('+Math.floor(r.totalDays/7)+' hét '+(r.totalDays%7)+' nap)', 'hét')+
+      stat(nf(r.totalMonths), 'teljes hónap')+
+      stat(nf(r.totalDays*24), 'óra')+
+    '</div></div>'+
+    '<div class="card"><ul class="list">'+
+      '<li><span>Kezdet</span><span>'+fmtDate(a)+'</span></li>'+
+      '<li><span>Vég</span><span>'+fmtDate(b)+'</span></li>'+
+      '<li><span>Hétköznap (H–P)</span><span>'+nf(wd)+' nap</span></li>'+
+      '<li><span>Hétvégi nap</span><span>'+nf(r.totalDays+1-wd)+' nap</span></li>'+
+    '</ul><p class="hint">A hétköznapok száma mindkét végnapot tartalmazza, az ünnepnapokat nem vonja le.</p></div>';
+}
+
+/* DÁTUM +/- */
+let sign = 1;
+document.querySelectorAll('#signSeg button').forEach(b => b.addEventListener('click', () => {
+  sign = Number(b.dataset.sign);
+  document.querySelectorAll('#signSeg button').forEach(x => x.classList.toggle('on', x === b));
+  renderAdd();
+}));
+function num(id){ const v = parseInt($(id).value, 10); return isNaN(v) || v < 0 ? 0 : v; }
+function renderAdd(){
+  const s = parseISO($('a0').value);
+  const out = $('addOut');
+  if(!s){ out.innerHTML = '<p class="hint">Add meg a kiinduló dátumot.</p>'; return; }
+  const y = num('aY'), m = num('aM'), w = num('aW'), d = num('aD');
+  const res = addDays(addMonths(s, sign*(y*12+m)), sign*(w*7+d));
+  const yr = res.getUTCFullYear();
+  if(yr < 1 || yr > 9999){ out.innerHTML = '<p class="err">Az eredmény kívül esik a támogatott tartományon.</p>'; return; }
+  const diff = Math.round((res - todayUTC())/DAY);
+  out.innerHTML =
+    '<div class="card hero"><div class="big">'+res.getUTCFullYear()+'. '+HU_MONTHS[res.getUTCMonth()]+' '+res.getUTCDate()+'.</div>'+
+    '<div class="small">'+HU_DAYS[res.getUTCDay()]+'</div>'+
+    '<div class="pill">Ma-hoz képest: '+relDays(diff)+'</div></div>';
+}
+
+/* Események + kezdőértékek */
+['birth','ageTo'].forEach(i => $(i).addEventListener('input', renderAge));
+['d1','d2'].forEach(i => $(i).addEventListener('input', renderDiff));
+['a0','aY','aM','aW','aD'].forEach(i => $(i).addEventListener('input', renderAdd));
+$('ageToday').onclick = () => { $('ageTo').value = toISO(todayUTC()); renderAge(); };
+$('d1Today').onclick = () => { $('d1').value = toISO(todayUTC()); renderDiff(); };
+$('d2Today').onclick = () => { $('d2').value = toISO(todayUTC()); renderDiff(); };
+$('a0Today').onclick = () => { $('a0').value = toISO(todayUTC()); renderAdd(); };
+
+const t0 = toISO(todayUTC());
+$('ageTo').value = t0; $('d1').value = t0; $('d2').value = t0; $('a0').value = t0;
+renderAge(); renderDiff(); renderAdd();
+try {
+  const t = sessionStorage.getItem('kdTab');
+  if(t){ const b = document.querySelector('#tabs button[data-tab="'+t+'"]'); if(b) b.click(); }
+} catch(e){}
+</script>
+</body>
+</html>
