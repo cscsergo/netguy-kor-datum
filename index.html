@@ -6,7 +6,7 @@
 <title>NetguY Kor és Dátum Kalkulátor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -39,7 +39,7 @@
 html,body{margin:0}
 body{
   color:var(--text);
-  font-family:"Hanken Grotesk","Aeonik Pro","Aeonik",-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-family:"Audiowide","Hanken Grotesk",-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   background:
     radial-gradient(800px 520px at 0% -8%, var(--bg1) 0%, transparent 62%),
     radial-gradient(700px 520px at 100% 0%, var(--bg2) 0%, transparent 58%),
@@ -49,11 +49,12 @@ body{
   padding:max(18px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
   line-height:1.4;
   -webkit-font-smoothing:antialiased;
+  font-synthesis:none;
 }
 .app{max-width:480px;margin:0 auto}
 .top{display:flex;align-items:center;gap:14px;margin:4px 0 16px}
 .logo{width:52px;height:52px;border-radius:14px;box-shadow:0 6px 18px rgba(60,80,220,.35);flex:0 0 auto}
-h1{font-size:28px;margin:0;letter-spacing:-.6px;line-height:1.1;
+h1{font-size:25px;margin:0;letter-spacing:0;line-height:1.1;
   background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:var(--muted);font-size:14px;margin:3px 0 0}
 
@@ -97,16 +98,16 @@ input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-m
 .hero > *{position:relative;z-index:1}
 .ymd{display:flex;justify-content:center;gap:10px}
 .ymd .u{flex:1;max-width:120px;background:rgba(255,255,255,.16);border-radius:16px;padding:12px 4px 10px}
-.ymd .u b{display:block;font-size:38px;line-height:1;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.ymd .u b{display:block;font-size:32px;line-height:1.05;font-weight:400;letter-spacing:0;font-variant-numeric:tabular-nums}
 .ymd .u span{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;opacity:.85}
-.hero .big{font-size:32px;font-weight:800;letter-spacing:-.8px;line-height:1.15}
+.hero .big{font-size:26px;font-weight:400;letter-spacing:0;line-height:1.2}
 .hero .small{color:rgba(255,255,255,.88);font-size:14px;margin-top:12px}
 .hero .ok{color:#c5ffe3;font-weight:700}
 .pill{display:inline-block;background:rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;margin-top:14px}
 
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{background:var(--tile);border-radius:16px;padding:13px 14px;border:1px solid var(--line)}
-.stat b{display:block;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.stat b{display:block;font-size:16px;font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:0;overflow-wrap:anywhere}
 .stat span{font-size:12px;color:var(--muted);font-weight:500}
 .stat:nth-child(6n+1) b{color:#0a84ff}
 .stat:nth-child(6n+2) b{color:#7d5cf0}
@@ -115,7 +116,7 @@ input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-m
 .stat:nth-child(6n+5) b{color:#e5527a}
 .stat:nth-child(6n+6) b{color:#2fb56a}
 .list{margin:0;padding:0;list-style:none}
-.list li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+.list li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
 .list li:first-child{padding-top:2px}
 .list li:last-child{border-bottom:0;padding-bottom:2px}
 .list li span:first-child{color:var(--muted)}
